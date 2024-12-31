@@ -12,7 +12,6 @@ from pypylon import pylon
 import cv2
 import time
 import numpy
-from matplotlib import pyplot as plt
 
 # Print version string
 print ("OpenCV version :  {0}".format(cv2.__version__))
@@ -61,22 +60,18 @@ while camera.IsGrabbing():
         image = converter.Convert(grabResult)
         img = image.GetArray()
         imgorigineel = img
-        imorgineel = cv2.resize(imgorigineel, ((int)(camera.Width.Value/6),
+        imgorigineel = cv2.resize(imgorigineel, ((int)(camera.Width.Value/6),
                                (int)(camera.Height.Value/6)))
+        '''
         cv2.namedWindow('Orgineel', cv2.WINDOW_AUTOSIZE)
         cv2.imshow('Orgineel', imorgineel)
-
-        # do some image processing
-        
-        
-        
-        # ENHANCEMENT           
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        '''
         
         # Histogram
         #histogram = cv2.calcHist(img, [0], None, [256], [0, 256])
         #cv2.normalize(histogram,histogram, 0,255,cv2.NORM_MINMAX)
         
+        '''
         h = numpy.zeros((300, 256, 3))
         bins = numpy.arange(256).reshape(256, 1)
         color = [ (255, 255, 255)]
@@ -88,49 +83,84 @@ while camera.IsGrabbing():
             cv2.polylines(h, [pts], False, col)
         h = numpy.flipud(h)
         cv2.imshow('Histogram', h)
+        '''
         
-        img = cv2.GaussianBlur(img, (65,65), 0)
-        img = cv2.GaussianBlur(img, (65,65), 0)
-        #img = cv2.GaussianBlur(img, (65,65), 0)
-        
-        #img = cv2.Canny(img, 100, 200)
-        
-        imS = cv2.resize(img, ((int)(camera.Width.Value/6),
-                               (int)(camera.Height.Value/6)))
+        # ENHANCEMENT           
+        img = cv2.cvtColor(imgorigineel, cv2.COLOR_BGR2GRAY)
+        img = cv2.GaussianBlur(img, (11,11), 0)
+        '''
         cv2.namedWindow('Enhancement', cv2.WINDOW_AUTOSIZE)
-        cv2.imshow('Enhancement', imS)
-        
-        kernel = numpy.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]])
-        #img = cv2.filter2D(img, -1,kernel)
-        #img = cv2.Canny(img, 100, 200)
-        #img = cv2.equalizeHist(img)
+        cv2.imshow('Enhancement', img)
+        '''
         
         # SEGMENTATION
         ret3,th3 = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-        imSth3 = cv2.resize(th3, ((int)(camera.Width.Value/6),
-                               (int)(camera.Height.Value/6)))
+        
         cv2.namedWindow('Threshold', cv2.WINDOW_AUTOSIZE)
-        cv2.imshow('Threshold', imSth3)
+        cv2.imshow('Threshold', th3)
         
-        '''
-        kernel = numpy.ones((10,10),numpy.uint8)
-        opening = cv2.morphologyEx(th3, cv2.MORPH_OPEN, kernel)
-        #closing = cv2.morphologyEx(th3, cv2.MORPH_CLOSE, kernel)
-        imSth5 = cv2.resize(opening, ((int)(camera.Width.Value/6),
-                               (int)(camera.Height.Value/6)))
-        cv2.namedWindow('Opening', cv2.WINDOW_AUTOSIZE)
-        cv2.imshow('Opening', imSth5)
-        '''
+
+        # FEATURE EXTRACTION
+        contours, hierarchy = cv2.findContours(image=th3, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
+        imagecontours = imgorigineel.copy()
+        cv2.drawContours(image=imagecontours, contours=contours, contourIdx=-1, color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
         
-        '''
-        kernel = numpy.ones((5,5),numpy.uint8)
-        DifDilEr = cv2.morphologyEx(opening, cv2.MORPH_GRADIENT, kernel)
-        imSth4 = cv2.resize(DifDilEr, ((int)(camera.Width.Value/6),
-                               (int)(camera.Height.Value/6)))
-        cv2.namedWindow('Dilation-Erosion', cv2.WINDOW_AUTOSIZE)
-        cv2.imshow('Dilation-Erosion', imSth4)
-        '''
-    
+        cv2.namedWindow('Contours', cv2.WINDOW_AUTOSIZE)
+        cv2.imshow('Contours', imagecontours)
+        
+        
+        # RING TEMPLATE
+        ring = cv2.imread('ring.png', cv2.IMREAD_COLOR)
+        ringgray = cv2.cvtColor(ring, cv2.COLOR_BGR2GRAY)
+        ringgaus = cv2.GaussianBlur(ringgray, (11,11), 0)
+        ret3ring,th3ring = cv2.threshold(ringgaus,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        contoursring, hierarchyring = cv2.findContours(image=th3ring, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
+        cv2.drawContours(image=ring, contours=contoursring, contourIdx=-1, color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
+        cv2.namedWindow('Ring', cv2.WINDOW_AUTOSIZE)
+        cv2.imshow('Ring', ring)
+        
+        # MOER TEMPLATE
+        moer = cv2.imread('moer.png', cv2.IMREAD_COLOR)
+        moergray = cv2.cvtColor(moer, cv2.COLOR_BGR2GRAY)
+        moergaus = cv2.GaussianBlur(moergray, (11,11), 0)
+        ret3moer, th3moer = cv2.threshold(moergaus, 0, 255, cv2.THREAS_BINARY+cv2.THRESH_OTSU)
+        contoursmoer, hierarchymoer = cv2.findContours(image=th3moer, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
+        cv2.drawContours(image=moer, contours=contoursring, contourIdx=-1, color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
+        cv2.namedWindow('Moer', cv2.WINDOW_AUTOSIZE)
+        cv2.imshow('Moer', moer)
+        
+        # SCHROEF TEMPLATE
+        schroef = cv2.imread('schroef.png', cv2.IMREAD_COLOR)
+        schroefgray = cv2.cvtColor(schroef, cv2.COLOR_BGR2GRAY)
+        schroefgaus = cv2.GaussianBlur(schroefgray, (11,11), 0)
+        ret3schroef, th3schroef = cv2.threshold(schroefgaus, 0, 255, cv2.THREAS_BINARY+cv2.THRESH_OTSU)
+        contoursschroef, hierarchyschroef = cv2.findContours(image=th3schroef, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
+        cv2.drawContours(image=schroef, contours=contoursring, contourIdx=-1, color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
+        cv2.namedWindow('Schroef', cv2.WINDOW_AUTOSIZE)
+        cv2.imshow('Schroef', schroef)
+        
+        # SPIJKER TEMPLATE
+        spijker = cv2.imread('spijker.png', cv2.IMREAD_COLOR)
+        spijkergray = cv2.cvtColor(spijker, cv2.COLOR_BGR2GRAY)
+        spijkergaus = cv2.GaussianBlur(spijkergray, (11,11), 0)
+        ret3spijker, th3spijker = cv2.threshold(spijkergaus, 0, 255, cv2.THREAS_BINARY+cv2.THRESH_OTSU)
+        contoursspijker, hierarchyspijker = cv2.findContours(image=th3spijker, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
+        cv2.drawContours(image=spijker, contours=contoursring, contourIdx=-1, color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
+        cv2.namedWindow('Spijker', cv2.WINDOW_AUTOSIZE)
+        cv2.imshow('Spijker', spijker)
+        
+        for c in contours: 
+            match = cv2.matchShapes(contoursring[1], c, 1, 0.0)
+            if match < 0.15:
+                closest_contour = c
+            else:
+                closest_contour = []
+        imgmatch = imgorigineel.copy()
+        print(contours[0])
+        # if contours.size
+        cv2.drawContours(imgmatch, [closest_contour], -1, (0, 255, 0), 3)
+        cv2.imshow("Output", imgmatch)
+        
         # press esc (ascii 27) to exit
         k = cv2.waitKey(1)
         if k == 27:
