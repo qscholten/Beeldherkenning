@@ -24,6 +24,8 @@
 4.
 
 5.
+
+# Stappenplan
 **Aquisitie**: Voor de aquisitie van beelden is het nodig om de camera zo in te stellen dat het beeld zo scherp mogelijk is. Zo wordt zo veel mogelijk informatie opgenomen. Aangezien het niet mogelijk is om meer informatie te halen uit beelden dan dat er is opgenomen is het zaak om zo veel mogelijk informatie op te nemen. Door te werken met de camera's van het lab, welke ruwe, onbewerkte informatie van de sensor sturen naar de computer, gaat er geen informatie verloren door compressie methoden. De scherpte-diepte van de verkregen afbeeldingen hoort laag te zijn. De belichtingstijd is hoog zodat er genoeg licht op de sensor valt. Dit kan doordat er gewerkt wordt met stilliggende voorwerpen, dus er is geen sprake van bewegingsonscherpte. Ook zorgt de maximale opening van het diafragma voor veel licht op de sensor. Bij het herkennen van spijkers, schroeven, bouten en moeren is het niet nodig om een hoge scherpte diepte te hebben, aangezien alle voorwerpen op de voorgrond liggen en de achtergrond niet scherp hoeft te zijn. Ook moet de gain zo groot mogelijk zijn om het contrast tussen de donkere achtergrond en de lichte voorwerpen zo groot mogelijk te maken.
 
 **Enhancement**: Eerst zal de afbeelding naar grijswaarden worden omgezet. Het gaat om het herkennen van objecten die herkenbaar zijn door hun vorm, niet door de kleur. Op deze manier kan segmentatie plaatsvinden op basis van helderheid en kan er gewerkt worden met 1 waarde in plaats van met 3 waardes. Voor de enhancement wordt gebruik gemaakt van contrastverhoging. Dit zorgt er voor dat de spijkers, schroeven en moeren beter te onderscheiden zijn van de donkere achtergrond. Dit is mogelijk door gebruik van histogram equalisation. Ook zal er gebruik gemaakt worden van edge detection om de randen van de voorwerpen te kunnen herkennen. Op die manier kan de vorm van de objecten in beeld gebracht worden en kan er herkenning van de vormen plaatsvinden. Ook wordt er gebruik gemaakt van mediaan filtering om zo de ruis in de afbeelding te verwijderen.
@@ -34,4 +36,9 @@
 
 **Pattern Recognition**: Voor de pattern recognition gebruik ik K-means om de objecten van de achtergrond te onderscheiden. Met behulp van beslisbomen wordt herkent welk voorwerp wat is.
 
-6.
+# Uitwerking
+**Aquisitie**: Voor de aquisitie heb ik de de objecten zo scherp mogelijk gefilmd en de afbeelding overbelicht omdat zo het contrast tussen de objecten en de achtergrond groter zijn.
+**Enhancement**: Voor de enhancement heb ik de afbeelding naar grijswaarden gezet, aangezien alle objecten dezelfde kleur hebben, maakt dit het makkelijker om de objecten te onderscheiden. Daarna heb ik er een Gauss filter overheen gedaan om de ruis van de achtergrond weg te filteren. 
+**Segmentatie**: Voor de segmentatie heb ik de geresulteerde afbeelding gethreshhold. Hierdoor worden de objecten van de achtergrond onderscheiden. 
+**Feature Extraction**: Voor de feature extraction heb ik de contouren gevonden van de objecten die gedetecteerd moesten worden. 
+**Pattern Recognition**: Bij pattern recognition heb ik de gevonden contouren vergeleken met de contours van de vooraf ingeladen templates van de verschillende objecten om zo te vinden welke objecten onder welke categorie vallen en hoeveel van welke categorie aanwezig zijn.
