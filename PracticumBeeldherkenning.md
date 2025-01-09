@@ -38,7 +38,11 @@
 
 # Uitwerking
 **Aquisitie**: Voor de aquisitie heb ik de de objecten zo scherp mogelijk gefilmd en de afbeelding overbelicht omdat zo het contrast tussen de objecten en de achtergrond groter zijn.
+
 **Enhancement**: Voor de enhancement heb ik de afbeelding naar grijswaarden gezet, aangezien alle objecten dezelfde kleur hebben, maakt dit het makkelijker om de objecten te onderscheiden. Daarna heb ik er een Gauss filter overheen gedaan om de ruis van de achtergrond weg te filteren. 
+
 **Segmentatie**: Voor de segmentatie heb ik de geresulteerde afbeelding gethreshhold. Hierdoor worden de objecten van de achtergrond onderscheiden. 
+
 **Feature Extraction**: Voor de feature extraction heb ik de contouren gevonden van de objecten die gedetecteerd moesten worden. 
+
 **Pattern Recognition**: Bij pattern recognition heb ik de gevonden contouren vergeleken met de contours van de vooraf ingeladen templates van de verschillende objecten om zo te vinden welke objecten onder welke categorie vallen en hoeveel van welke categorie aanwezig zijn.
